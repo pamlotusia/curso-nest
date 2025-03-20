@@ -1,6 +1,7 @@
+import { UpdateTaskDto } from './dto/update-task.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Task } from './entities/task.entity';
-import { throwError } from 'rxjs';
+import { CreateTaskDto } from './dto/create-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -18,43 +19,47 @@ export class TasksService {
     return this.tasks;
   }
 
-  findOne(id: string) {
-    const task = this.tasks.find((task) => task.id === Number(id));
-    if (task) return task;
-    throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
+  findOne(id: number) {
+    const task = this.tasks.find((task) => task.id === id);
+    if(!task){
+      throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
+    }
+    return task
   }
 
-  create(body: any) {
+  create(createTaskDto:CreateTaskDto) {
     const newId = this.tasks.length + 1;
 
     const newTask = {
       id: newId,
-      ...body,
+      ...createTaskDto,
+      completed: false
     };
 
     this.tasks.push(newTask);
+    console.log(newTask)
 
-    return body;
+    return createTaskDto;
   }
 
-  update(id: string, body: any) {
-    const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
+  update(id: number, updateTaskDto: UpdateTaskDto) {
+    const taskIndex = this.tasks.findIndex((task) => task.id === id);
 
     if (taskIndex < 0) {
       throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
-    }
+    } 
     const taskItem = this.tasks[taskIndex];
 
     this.tasks[taskIndex] = {
       ...taskItem,
-      ...body,
+      ...updateTaskDto,
     };
 
     return 'Tarefa atualizada com sucesso!';
   }
 
-  delete(id: string){
-    const taskIndex = this.tasks.findIndex((task) => task.id === Number(id));
+  delete(id: number){
+    const taskIndex = this.tasks.findIndex((task) => task.id === id);
 
     if (taskIndex < 0) {
       throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
