@@ -1,3 +1,4 @@
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Task } from './entities/task.entity';
@@ -9,18 +10,17 @@ import { PrismaService } from '../prisma/prisma.service';
 export class TasksService {
   constructor(private prisma: PrismaService) {}
 
-  private tasks: Task[] = [
-    {
-      id: 1,
-      name: 'Fazer autenticação de usuário',
-      description:
-        'A autenticação precisa estar de acordo com os parametros do banco',
-      completed: false,
-    },
-  ];
+  async findAll(paginationDto?:PaginationDto) {
+    const limit = paginationDto?.limit ?? 10;
+    const offset = paginationDto?.offset ?? 0;
 
-  async findAll() {
-    const allTasks = await this.prisma.task.findMany();
+    const allTasks = await this.prisma.task.findMany({
+      take: limit,
+      skip: offset,
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
     return allTasks;
   }
 
