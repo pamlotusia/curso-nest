@@ -21,60 +21,75 @@ export class TasksService {
 
   async findAll() {
     const allTasks = await this.prisma.task.findMany();
-    return allTasks
+    return allTasks;
   }
 
   async findOne(id: number) {
     const task = await this.prisma.task.findFirst({
       where: {
-        id: id
+        id: id,
+      },
+    });
+
+    if (task?.name) return task;
+
+    throw new HttpException('Tarefa não encontrada', HttpStatus.NOT_FOUND);
+  }
+
+  async create(createTaskDto: CreateTaskDto) {
+    const newTask = await this.prisma.task.create({
+      data: {
+        name: createTaskDto.name,
+        description: createTaskDto.description,
+        completed: false,
+      },
+    });
+
+    return newTask;
+  }
+
+  async update(id: number, updateTaskDto: UpdateTaskDto) {
+    const currTask = await this.prisma.task.findFirst({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!currTask) {
+      throw new HttpException('Tarefa não encontrada', HttpStatus.NOT_FOUND);
+    }
+
+    const task = await this.prisma.task.update({
+      where: {
+        id: id,
+      },
+      data: updateTaskDto,
+    });
+    return task;
+  }
+
+  async delete(id: number) {
+    try {
+      const currTask = await this.prisma.task.findFirst({
+        where: {
+          id: id,
+        },
+      });
+
+      if (!currTask) {
+        throw new HttpException('Tarefa não encontrada', HttpStatus.NOT_FOUND);
       }
-    })
-    
-    if(task?.name) return task
 
-    throw new HttpException("Tarefa não encontrada", HttpStatus.NOT_FOUND)
-  }
+      await this.prisma.task.delete({
+        where: {
+          id: currTask.id,
+        },
+      });
 
-  create(createTaskDto: CreateTaskDto) {
-    const newId = this.tasks.length + 1;
+      return 'Tarefa deletada com sucesso!';
 
-    const newTask = {
-      id: newId,
-      ...createTaskDto,
-      completed: false,
-    };
-
-    this.tasks.push(newTask);
-    console.log(newTask);
-
-    return createTaskDto;
-  }
-
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    const taskIndex = this.tasks.findIndex((task) => task.id === id);
-
-    if (taskIndex < 0) {
-      throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
+    } catch (err) {
+      throw new HttpException('Falha ao deletar essa tarefa.', HttpStatus.BAD_REQUEST);
     }
-    const taskItem = this.tasks[taskIndex];
-
-    this.tasks[taskIndex] = {
-      ...taskItem,
-      ...updateTaskDto,
-    };
-
-    return 'Tarefa atualizada com sucesso!';
-  }
-
-  delete(id: number) {
-    const taskIndex = this.tasks.findIndex((task) => task.id === id);
-
-    if (taskIndex < 0) {
-      throw new HttpException('Essa tarefa não existe', HttpStatus.NOT_FOUND);
-    }
-
-    this.tasks.splice(taskIndex, 1);
-    return 'Tarefa excluída com sucesso!';
   }
 }
