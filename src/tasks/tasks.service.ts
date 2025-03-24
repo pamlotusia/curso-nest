@@ -37,15 +37,22 @@ export class TasksService {
   }
 
   async create(createTaskDto: CreateTaskDto) {
-    const newTask = await this.prisma.task.create({
-      data: {
-        name: createTaskDto.name,
-        description: createTaskDto.description,
-        completed: false,
-      },
-    });
+    try{
+      const newTask = await this.prisma.task.create({
+        data: {
+          name: createTaskDto.name,
+          description: createTaskDto.description,
+          completed: false,
+          userId: createTaskDto.userId
+        },
+      });
 
-    return newTask;
+      return newTask;
+    }
+    catch(e){
+      throw new Error(e.message)
+    }
+
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {

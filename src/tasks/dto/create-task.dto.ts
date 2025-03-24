@@ -1,4 +1,3 @@
-import { IsNumberOptions } from './../../../node_modules/class-validator/types/decorator/typechecker/IsNumber.d';
 /*
   DTO > Data Transfer Object (Objeto de transferencia de dados)
   > validar dados, transformar dados
@@ -6,7 +5,7 @@ import { IsNumberOptions } from './../../../node_modules/class-validator/types/d
 
 */
 
-import { IsNotEmpty, IsString, MinLength } from "class-validator";
+import { IsNotEmpty, IsString, MinLength, IsNumber } from "class-validator";
 
 export class CreateTaskDto{
   @IsString()
@@ -17,4 +16,8 @@ export class CreateTaskDto{
   @IsString()
   @IsNotEmpty()
   readonly description: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly userId: number;
 }
