@@ -12,6 +12,12 @@ export class UsersService {
       where: {
         id: id,
       },
+      select:{
+        id: true,
+        email: true,
+        name:true,
+        Task: true
+      }
     });
 
     if (!user) {

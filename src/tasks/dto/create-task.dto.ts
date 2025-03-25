@@ -5,7 +5,7 @@
 
 */
 
-import { IsNotEmpty, IsString, MinLength, IsNumber } from "class-validator";
+import { IsNotEmpty, IsString, MinLength, IsNumber, IsBoolean, IsOptional } from "class-validator";
 
 export class CreateTaskDto{
   @IsString()
@@ -20,4 +20,8 @@ export class CreateTaskDto{
   @IsNumber()
   @IsNotEmpty()
   readonly userId: number;
+
+  @IsBoolean()
+  @IsOptional()
+  readonly completed?: boolean
 }
